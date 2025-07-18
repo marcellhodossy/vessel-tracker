@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="ChatGPT" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <trk>
+    <name>Central Park szimulált séta időbélyeggel</name>
+    <trkseg>
+      <trkpt lat="40.768094" lon="-73.981762">
+        <time>2025-07-18T10:00:00Z</time>
+        <name>Columbus Circle</name>
+      </trkpt>
+      <trkpt lat="40.771133" lon="-73.976762">
+        <time>2025-07-18T10:07:30Z</time>
+        <name>Sheep Meadow</name>
+      </trkpt>
+      <trkpt lat="40.772741" lon="-73.974187">
+        <time>2025-07-18T10:15:00Z</time>
+        <name>The Mall</name>
+      </trkpt>
+      <trkpt lat="40.774054" lon="-73.970870">
+        <time>2025-07-18T10:22:30Z</time>
+        <name>Bethesda Terrace</name>
+      </trkpt>
+      <trkpt lat="40.775528" lon="-73.969222">
+        <time>2025-07-18T10:30:00Z</time>
+        <name>Loeb Boathouse</name>
+      </trkpt>
+      <trkpt lat="40.776280" lon="-73.967561">
+        <time>2025-07-18T10:37:30Z</time>
+        <name>Conservatory Water</name>
+      </trkpt>
+      <trkpt lat="40.776877" lon="-73.966741">
+        <time>2025-07-18T10:45:00Z</time>
+        <name>Alice in Wonderland</name>
+      </trkpt>
+      <trkpt lat="40.779437" lon="-73.969145">
+        <time>2025-07-18T10:52:30Z</time>
+        <name>Belvedere Castle</name>
+      </trkpt>
+      <trkpt lat="40.781324" lon="-73.966489">
+        <time>2025-07-18T11:00:00Z</time>
+        <name>The Great Lawn</name>
+      </trkpt>
+      <trkpt lat="40.784083" lon="-73.964853">
+        <time>2025-07-18T11:07:30Z</time>
+        <name>Reservoir South</name>
+      </trkpt>
+      <trkpt lat="40.782810" lon="-73.971807">
+        <time>2025-07-18T11:15:00Z</time>
+        <name>Reservoir West</name>
+      </trkpt>
+      <trkpt lat="40.776122" lon="-73.974187">
+        <time>2025-07-18T11:22:30Z</time>
+        <name>Return Loop</name>
+      </trkpt>
+      <trkpt lat="40.768094" lon="-73.981762">
+        <time>2025-07-18T11:30:00Z</time>
+        <name>Columbus Circle (Visszatérés)</name>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
