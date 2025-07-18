@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vessel Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex justify-center pt-8 px-4">
+
+  <a href="/users/"
+     class="fixed top-4 left-4 bg-white px-3 py-1.5 rounded-md shadow-md text-gray-700 text-sm hover:bg-gray-200 transition">
+    ⬅ Back
+  </a>
+
+  <div class="w-full max-w-3xl space-y-8">
+
+    <!-- Flash messages -->
+    <% if(error) { %>
+      <div class="border border-red-400 bg-red-100 text-red-800 px-4 py-3 rounded-lg shadow-md">
+        <strong class="font-semibold">Error:</strong> <%= error %>
+      </div>
+    <% } %>
+
+    <% if(success) { %>
+      <div class="border border-green-400 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-md">
+        <strong class="font-semibold">Success:</strong> <%= success %>
+      </div>
+    <% } %>
+
+    <!-- Navigation buttons -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <button onclick="ChangeForm('myroutes')"
+                class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow transition w-full">
+          My Routes
+        </button>
+        <button onclick="ChangeForm('createroutes')"
+                class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow transition w-full">
+          Create Route
+        </button>
+      </div>
+    </div>
+
+    <!-- My Routes -->
+    <div id="myroutes">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-4">Your Routes</h2>
+
+        <% if (routes.length > 0) { for (let i = routes.length - 1; i >= 0; i--) { %>
+          <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-4 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <div class="font-semibold text-lg"><%= routes[i].routes %></div>
+              <div class="text-sm text-gray-500"><%= routes[i].timestamp %></div>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
+              <a href="/users/myroutes/views/<%= routes[i].id %>"
+                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition text-sm">
+                View
+              </a>
+              <a href="/users/myroutes/upload/<%= routes[i].id %>"
+                 class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition text-sm">
+                Upload
+              </a>
+              <a href="/users/myroutes/delete/<%= routes[i].id %>"
+                 class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition text-sm">
+                Delete
+              </a>
+            </div>
+          </div>
+        <% } } else { %>
+          <p class="text-gray-500">You don’t have any saved routes yet.</p>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Create Route -->
+    <div id="createroutes" hidden>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-4">Create a New Route</h2>
+
+        <form method="post" action="/users/myroutes/create">
+          <label for="routeName" class="block text-sm font-medium text-gray-700 mb-1">Route Name:</label>
+          <input id="name" name="name" type="text"
+                 class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-green-300 focus:outline-none"
+                 placeholder="Enter route name" required />
+
+          <button type="submit"
+                  class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow transition">
+            Create Route
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function ChangeForm(name) {
+      const myroutes = document.getElementById("myroutes");
+      const createroutes = document.getElementById("createroutes");
+
+      myroutes.hidden = true;
+      createroutes.hidden = true;
+      document.getElementById(name).hidden = false;
+    }
+  </script>
+
+</body>
+</html>

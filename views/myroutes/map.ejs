@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vessel Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+    #controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 15px;
+      background: white;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      z-index: 1000;
+    }
+    #timeSlider {
+      flex-grow: 1;
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 0.75rem !important;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15) !important;
+    }
+    .leaflet-popup-content {
+      font-size: 1rem;
+      font-family: 'Segoe UI', sans-serif;
+      color: #374151;
+    }
+    .leaflet-container {
+      background: #f0f4f8;
+    }
+  </style>
+</head>
+<body class="relative bg-gray-100">
+
+  <a href="/users/myroutes/"
+     class="fixed top-4 right-4 z-[1000] bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg text-gray-700 hover:bg-gray-200 transition duration-300">
+    ← Back
+  </a>
+
+  <div id="map"></div>
+
+  <div id="controls">
+    <button id="startStopBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Start</button>
+
+    <label for="speedRange" class="font-semibold">Speed:</label>
+    <input id="speedRange" type="range" min="0.1" max="10" value="1" step="0.1" style="width: 120px;" />
+    <span id="speedValue">1x</span>
+
+    <input id="timeSlider" type="range" min="0" max="100" value="0" step="0.1" />
+    <span id="timeLabel">00:00:00</span>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const markers = JSON.parse('<%- JSON.stringify(positions) %>');
+
+    markers.forEach(m => {
+      m.lat = Number(m.lat);
+      m.lng = Number(m.lng);
+    });
+
+    const map = L.map('map').setView([markers[0].lat, markers[0].lng], 16);
+
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const customIcon = L.icon({
+      iconUrl: '/cdn/icon.svg',
+      iconSize: [64, 64],
+      iconAnchor: [32, 64],
+      popupAnchor: [0, -64]
+    });
+
+    const marker = L.marker([markers[0].lat, markers[0].lng], { icon: customIcon }).addTo(map);
+    const polyline = L.polyline([[markers[0].lat, markers[0].lng]]).addTo(map);
+
+    function formatTime(date) {
+      const d = new Date(date);
+      return d.toISOString().substr(11, 8);
+    }
+
+    const timestamps = markers.map(m => new Date(m.timestamp).getTime());
+    const startTime = timestamps[0];
+    const endTime = timestamps[timestamps.length - 1];
+
+    const timeSlider = document.getElementById('timeSlider');
+    timeSlider.min = startTime;
+    timeSlider.max = endTime;
+    timeSlider.value = startTime;
+    timeSlider.step = 100;
+
+    const timeLabel = document.getElementById('timeLabel');
+    const speedRange = document.getElementById('speedRange');
+    const speedValue = document.getElementById('speedValue');
+    const startStopBtn = document.getElementById('startStopBtn');
+
+    let animationId = null;
+    let isPlaying = false;
+    let currentTime = startTime;
+    let speed = parseFloat(speedRange.value);
+
+    function interpolatePosition(t) {
+      if (t <= timestamps[0]) return { lat: markers[0].lat, lng: markers[0].lng };
+      if (t >= timestamps[timestamps.length - 1]) return { lat: markers[markers.length - 1].lat, lng: markers[markers.length - 1].lng };
+
+      for (let i = 1; i < timestamps.length; i++) {
+        if (t < timestamps[i]) {
+          const t1 = timestamps[i - 1];
+          const t2 = timestamps[i];
+          const ratio = (t - t1) / (t2 - t1);
+
+          const lat = Number(markers[i - 1].lat) + ratio * (Number(markers[i].lat) - Number(markers[i - 1].lat));
+          const lng = Number(markers[i - 1].lng) + ratio * (Number(markers[i].lng) - Number(markers[i - 1].lng));
+          return { lat, lng };
+        }
+      }
+    }
+
+    function updateMarkerAndPolyline(t) {
+      const pos = interpolatePosition(t);
+      marker.setLatLng([pos.lat, pos.lng]);
+
+      const visiblePoints = markers.filter(m => new Date(m.timestamp).getTime() <= t).map(m => [m.lat, m.lng]);
+      if (visiblePoints.length === 0 || (visiblePoints[visiblePoints.length -1][0] !== pos.lat || visiblePoints[visiblePoints.length -1][1] !== pos.lng)) {
+        visiblePoints.push([pos.lat, pos.lng]);
+      }
+      polyline.setLatLngs(visiblePoints);
+
+      timeLabel.textContent = formatTime(t);
+    }
+
+    function animate() {
+      if (!isPlaying) return;
+
+      currentTime += speed * 100;
+      if (currentTime > endTime) {
+        currentTime = endTime;
+        stopAnimation();
+        return;
+      }
+
+      timeSlider.value = currentTime;
+      updateMarkerAndPolyline(currentTime);
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    function startAnimation() {
+      if (isPlaying) return;
+      isPlaying = true;
+      startStopBtn.textContent = "Stop";
+      animationId = requestAnimationFrame(animate);
+    }
+
+    function stopAnimation() {
+      if (!isPlaying) return;
+      isPlaying = false;
+      startStopBtn.textContent = "Start";
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    }
+
+    startStopBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
+    });
+
+    timeSlider.addEventListener('input', () => {
+      currentTime = parseFloat(timeSlider.value);
+      updateMarkerAndPolyline(currentTime);
+      if (isPlaying) {
+        stopAnimation();
+      }
+    });
+
+    speedRange.addEventListener('input', () => {
+      speed = parseFloat(speedRange.value);
+      speedValue.textContent = speed.toFixed(1) + "x";
+    });
+
+    updateMarkerAndPolyline(startTime);
+  </script>
+
+</body>
+</html>

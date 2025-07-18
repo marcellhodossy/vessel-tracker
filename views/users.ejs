@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vessel Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-120 space-y-4 text-center">
+        <h1 class="font-bold text-2xl">Hello, <%= username %></h1>
+        <a href="/users/myroutes" class="block bg-blue-500 hover:bg-blue-400 rounded-lg p-4 w-100 text-white font-medium">
+            My Routes
+        </a>
+        <a href="/users/groups" class="block bg-green-500 hover:bg-green-400 rounded-lg p-4 w-100 text-white font-medium">
+            Groups
+        </a>
+        <a href="/users/settings" class="block bg-yellow-500 hover:bg-yellow-400 rounded-lg p-4 w-100 text-white font-medium">
+            Settings
+        </a>
+        <a href="/users/logout" class="block bg-red-500 hover:bg-red-400 rounded-lg p-4 w-100 text-white font-medium">
+            Logout
+        </a>
+    </div>
+</body>
+</html>
